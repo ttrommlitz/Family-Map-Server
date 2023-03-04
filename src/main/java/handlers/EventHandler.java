@@ -16,7 +16,7 @@ public class EventHandler extends Handler <EventRequest, EventResult> {
             String url = exchange.getRequestURI().getPath();
             System.out.println("Event handler called");
             boolean success = false;
-            if (exchange.getRequestMethod().toLowerCase().equals("get")) {
+            if (exchange.getRequestMethod().equalsIgnoreCase("get")) {
                 EventRequest request = new EventRequest();
                 EventService service = new EventService();
                 EventResult result;
@@ -30,12 +30,7 @@ public class EventHandler extends Handler <EventRequest, EventResult> {
                         request.setEventID(getEventID(url));
                         result = service.getEventByID(request);
                     }
-                    String respData = deserialize(result);
-                    int statusCode = result.isSuccess() ? HttpURLConnection.HTTP_OK : HttpURLConnection.HTTP_BAD_REQUEST;
-                    exchange.sendResponseHeaders(statusCode, 0);
-                    var respBody = exchange.getResponseBody();
-                    writeString(respData, respBody);
-                    respBody.close();
+                    sendResponse(exchange, result);
                     success = true;
                 }
             }

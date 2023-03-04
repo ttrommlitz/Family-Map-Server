@@ -36,4 +36,13 @@ public class ClearService extends Service {
         }
         return result;
     }
+
+    public void clearByUsername(String username) throws DataAccessException {
+        PersonDao personDao = new PersonDao(conn);
+        EventDao eventDao = new EventDao(conn);
+        ClearResult result = new ClearResult();
+
+        personDao.clearByUsername("Person", username);
+        eventDao.clearByUsername("Event", username);
+    }
 }

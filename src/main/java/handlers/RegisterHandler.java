@@ -14,16 +14,11 @@ public class RegisterHandler extends Handler <RegisterRequest, RegisterResult> {
         try {
             System.out.println("Register handler called");
             boolean success = false;
-            if (exchange.getRequestMethod().toLowerCase().equals("post")) {
+            if (exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 RegisterRequest request = serialize(RegisterRequest.class, exchange.getRequestBody());
                 RegisterService service = new RegisterService();
                 RegisterResult result = service.register(request);
-                String respData = deserialize(result);
-                int statusCode = result.isSuccess() ? HttpURLConnection.HTTP_OK : HttpURLConnection.HTTP_BAD_REQUEST;
-                exchange.sendResponseHeaders(statusCode, 0);
-                var respBody = exchange.getResponseBody();
-                writeString(respData, respBody);
-                respBody.close();
+                sendResponse(exchange, result);
                 success = true;
             }
             if (!success) {

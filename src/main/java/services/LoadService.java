@@ -2,6 +2,7 @@ package services;
 
 import model.*;
 import request.LoadRequest;
+import result.ClearResult;
 import result.LoadResult;
 import dao.*;
 
@@ -26,7 +27,13 @@ public class LoadService extends Service {
         LoadResult result = new LoadResult();
         try {
             ClearService clearService = new ClearService();
-            clearService.clear(true);
+            ClearResult clearResult = clearService.clear(true);
+            if (!clearResult.isSuccess()) {
+                result.setMessage(clearResult.getMessage());
+                result.setSuccess(false);
+                db.closeConnection(true);
+                return result;
+            }
             for (User user : users) {
                 userDao.insert(user);
             }

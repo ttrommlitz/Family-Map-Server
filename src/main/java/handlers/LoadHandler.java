@@ -14,16 +14,11 @@ public class LoadHandler extends Handler<LoadRequest, LoadResult> {
         try {
             System.out.println("Load handler called");
             boolean success = false;
-            if (exchange.getRequestMethod().toLowerCase().equals("post")) {
+            if (exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 LoadRequest request = serialize(LoadRequest.class, exchange.getRequestBody());
                 LoadService service = new LoadService();
                 LoadResult result = service.load(request);
-                String respData = deserialize(result);
-                int statusCode = result.isSuccess() ? HttpURLConnection.HTTP_OK : HttpURLConnection.HTTP_BAD_REQUEST;
-                exchange.sendResponseHeaders(statusCode, 0);
-                var respBody = exchange.getResponseBody();
-                writeString(respData, respBody);
-                respBody.close();
+                sendResponse(exchange, result);
                 success = true;
             }
             if (!success) {

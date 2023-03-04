@@ -14,15 +14,10 @@ public class ClearHandler extends Handler <ClearRequest, ClearResult> {
         try {
             System.out.println("Clear handler called");
             boolean success = false;
-            if (exchange.getRequestMethod().toLowerCase().equals("post")) {
+            if (exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 ClearService service = new ClearService();
                 ClearResult result = service.clear(false);
-                String respData = deserialize(result);
-                int statusCode = result.isSuccess() ? HttpURLConnection.HTTP_OK : HttpURLConnection.HTTP_BAD_REQUEST;
-                exchange.sendResponseHeaders(statusCode, 0);
-                var respBody = exchange.getResponseBody();
-                writeString(respData, respBody);
-                respBody.close();
+                sendResponse(exchange, result);
                 success = true;
             }
             if (!success) {

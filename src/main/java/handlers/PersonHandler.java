@@ -30,12 +30,7 @@ public class PersonHandler extends Handler <PersonRequest, PersonResult> {
                         request.setPersonID(getPersonID(url));
                         result = service.getPersonByID(request);
                     }
-                    String respData = deserialize(result);
-                    int statusCode = result.isSuccess() ? HttpURLConnection.HTTP_OK : HttpURLConnection.HTTP_BAD_REQUEST;
-                    exchange.sendResponseHeaders(statusCode, 0);
-                    var respBody = exchange.getResponseBody();
-                    writeString(respData, respBody);
-                    respBody.close();
+                    sendResponse(exchange, result);
                     success = true;
                 }
             }

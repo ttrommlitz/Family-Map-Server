@@ -1,6 +1,7 @@
 package handlers;
 
 import com.sun.net.httpserver.HttpExchange;
+import result.Result;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,12 +9,12 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.nio.file.Files;
 
-public class FileHandler extends Handler<Object, Object> {
+public class FileHandler extends Handler<Result, Result> {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         boolean success = false;
         try {
-            if (exchange.getRequestMethod().toLowerCase().equals("get")) {
+            if (exchange.getRequestMethod().equalsIgnoreCase("get")) {
                 String urlPath = exchange.getRequestURI().toString();
                 if (urlPath == null || urlPath.equals("/")) {
                     urlPath = "/index.html";
@@ -24,7 +25,7 @@ public class FileHandler extends Handler<Object, Object> {
                 if (!file.exists()) {
                     String badFilePath = "web/HTML/404.html";
                     File badFile = new File(badFilePath);
-                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
+                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, 0);
                     Files.copy(badFile.toPath(), respBody);
                 } else {
                     exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0 );

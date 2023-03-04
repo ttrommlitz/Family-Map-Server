@@ -4,6 +4,8 @@ package request;
  * for filling database **/
 public class FillRequest {
     private String username;
+
+    //defaults to 4 generations
     private Integer generations;
 
     public String getUsername() {

@@ -5,7 +5,11 @@ import dao.DataAccessException;
 import dao.UserDao;
 import model.Authtoken;
 import model.User;
+import request.FillRequest;
+import request.LoginRequest;
 import request.RegisterRequest;
+import result.FillResult;
+import result.LoginResult;
 import result.RegisterResult;
 
 import java.util.UUID;
@@ -41,15 +45,38 @@ public class RegisterService extends Service {
             Authtoken token = new Authtoken(authtoken, newUser.getUsername());
             authDao.insert(token);
 
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.setUsername(request.getUsername());
+            loginRequest.setPassword(request.getPassword());
+            LoginService loginService = new LoginService();
+            LoginResult loginResult = loginService.login(loginRequest, true);
+            if (!loginResult.isSuccess()) {
+                result.setMessage(loginResult.getMessage());
+                result.setSuccess(loginResult.isSuccess());
+                db.closeConnection(false);
+                return result;
+            }
+
+            FillRequest fillRequest = new FillRequest();
+            fillRequest.setUsername(request.getUsername());
+            fillRequest.setGenerations(4);
+            FillService fillService = new FillService(true);
+            FillResult fillResult = fillService.fill(fillRequest);
+            if (!fillResult.isSuccess()) {
+               result.setMessage(fillResult.getMessage());
+               result.setSuccess(fillResult.isSuccess());
+               db.closeConnection(false);
+               return result;
+            }
+
             result.setAuthtoken(authtoken);
-            result.setUsername(newUser.getUsername());
+            result.setUsername(request.getUsername());
             result.setPersonID(personID);
             result.setSuccess(true);
             db.closeConnection(true);
         } catch (DataAccessException e) {
             handleException(e, result);
         }
-
         return result;
     }
 }

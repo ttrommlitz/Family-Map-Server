@@ -16,7 +16,7 @@ public class LoginService extends Service {
      * @param request
      * @return LoginResult
      */
-    public LoginResult login(LoginRequest request) {
+    public LoginResult login(LoginRequest request, boolean beingCalledByOtherService) {
         UserDao userDao = new UserDao(conn);
         AuthtokenDao authDao = new AuthtokenDao(conn);
         LoginResult result = new LoginResult();
@@ -35,11 +35,15 @@ public class LoginService extends Service {
             result.setUsername(user.getUsername());
             result.setPersonID(user.getPersonID());
             result.setSuccess(true);
-            db.closeConnection(true);
+            if (!beingCalledByOtherService) {
+                db.closeConnection(true);
+            }
         } catch (DataAccessException e) {
             result.setMessage("Error: " + e.getMessage());
             result.setSuccess(false);
-            db.closeConnection(false);
+            if (!beingCalledByOtherService) {
+                db.closeConnection(false);
+            }
         }
         return result;
     }

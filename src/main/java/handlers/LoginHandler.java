@@ -14,16 +14,11 @@ public class LoginHandler extends Handler <LoginRequest, LoginResult> {
         try {
             System.out.println("Login handler called");
             boolean success = false;
-            if (exchange.getRequestMethod().toLowerCase().equals("post")) {
+            if (exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 LoginRequest request = serialize(LoginRequest.class, exchange.getRequestBody());
                 LoginService service = new LoginService();
-                LoginResult result = service.login(request);
-                String respData = deserialize(result);
-                int statusCode = result.isSuccess() ? HttpURLConnection.HTTP_OK : HttpURLConnection.HTTP_BAD_REQUEST;
-                exchange.sendResponseHeaders(statusCode, 0);
-                var respBody = exchange.getResponseBody();
-                writeString(respData, respBody);
-                respBody.close();
+                LoginResult result = service.login(request, false);
+                sendResponse(exchange, result);
                 success = true;
             }
             if (!success) {

@@ -6,8 +6,7 @@ import result.Result;
 
 import java.sql.Connection;
 
-/** Base Service class. To be implemented
- * or deleted later **/
+/** Base Service class **/
 public abstract class Service {
     protected static Database db;
     protected static Connection conn;
