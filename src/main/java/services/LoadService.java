@@ -34,6 +34,7 @@ public class LoadService extends Service {
                 db.closeConnection(true);
                 return result;
             }
+            if (users == null || events == null || persons == null) { throw new DataAccessException("Null arrays in request"); }
             for (User user : users) {
                 userDao.insert(user);
             }
