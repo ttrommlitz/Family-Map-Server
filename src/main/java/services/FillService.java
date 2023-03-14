@@ -34,10 +34,10 @@ public class FillService extends Service {
     private static final Integer GENERATIONAL_DIFFERENCE = 30;
     public FillService(boolean beingCalledByOtherService) {
         try {
-            maleNames = (maleNames == null) ? (MNameData)gsonMethod("json/mnames.json", MNameData.class) : maleNames;
-            femaleNames = (femaleNames == null) ? (FNameData)gsonMethod("json/fnames.json", FNameData.class) : femaleNames;
-            surnames = (surnames == null) ? (SNameData)gsonMethod("json/snames.json", SNameData.class) : surnames;
-            locations = (locations == null) ? (LocationData)gsonMethod("json/locations.json", LocationData.class) : locations;
+            maleNames = (maleNames == null) ? (MNameData) gsonLoadDate("json/mnames.json", MNameData.class) : maleNames;
+            femaleNames = (femaleNames == null) ? (FNameData) gsonLoadDate("json/fnames.json", FNameData.class) : femaleNames;
+            surnames = (surnames == null) ? (SNameData) gsonLoadDate("json/snames.json", SNameData.class) : surnames;
+            locations = (locations == null) ? (LocationData) gsonLoadDate("json/locations.json", LocationData.class) : locations;
             personDao = new PersonDao(conn);
             eventDao = new EventDao(conn);
             result = new FillResult();
@@ -90,10 +90,12 @@ public class FillService extends Service {
         return result;
     }
 
+    // recursively generates anscestors based off of user-provided generations
     private Person generateTree(String rootGender, int generations, User rootUser, Integer year) throws DataAccessException {
         Person mother = null;
         Person father = null;
         if (generations >= 1) {
+            // create mother and father and their marriage events
             mother = generateTree("f", generations - 1, rootUser, year - GENERATIONAL_DIFFERENCE);
             father = generateTree("m", generations - 1, rootUser, year - GENERATIONAL_DIFFERENCE);
 
@@ -108,11 +110,12 @@ public class FillService extends Service {
         Person person;
         String motherID = (mother != null) ? mother.getPersonID() : null;
         String fatherID = (father != null) ? father.getPersonID() : null;
-        // This will only be true if the current person is the root User
+        // This will only be true if the current person is the root User. Will create root Person
         if (generations == numGenerations) {
             person = new Person(rootUser.getPersonID(), rootUser.getUsername(), rootUser.getFirstName(),
                     rootUser.getLastName(), rootGender, motherID, fatherID, null);
         } else {
+            // creates an ancestor for the current User
             String personID = UUID.randomUUID().toString();
             String[] firstNames = rootGender.equals("m") ? maleNames.getData() : femaleNames.getData();
             String firstName = firstNames[(int) (firstNames.length * Math.random())];
@@ -124,17 +127,17 @@ public class FillService extends Service {
         return person;
     }
 
-    private Object gsonMethod(String filename, Type type) throws FileNotFoundException {
+    private Object gsonLoadDate(String filename, Type type) throws FileNotFoundException {
         Reader reader = new FileReader(filename);
         Gson gson = new Gson();
         return gson.fromJson(reader, type);
     }
 
     private void addMarriageEvent(Person mother, Person father, Integer currentYear) throws DataAccessException {
-        //
-        Integer motherBirthYear = currentYear - 20;
-        Integer fatherBirthYear = currentYear - 20;
-        Integer marriageYear = Math.min(motherBirthYear, fatherBirthYear) + 20 + (int)(10 * Math.random());
+        // creates a pseudo random year for both mother and father to help with marriage year
+        Integer motherRandomYear = currentYear - (int)(5 * Math.random()) + 18;
+        Integer fatherRandomYear = currentYear - (int)(5 * Math.random()) + 18;
+        Integer marriageYear = Math.min(motherRandomYear, fatherRandomYear) + 20 + (int)(10 * Math.random());
         Location marriageLocation = locations.getData()[(int)(locations.getData().length * Math.random())];
         String motherMarriageID = UUID.randomUUID().toString();
         String fatherMarriageID = UUID.randomUUID().toString();
@@ -168,6 +171,20 @@ public class FillService extends Service {
                 deathLocation.getLongitude(), deathLocation.getCountry(), deathLocation.getCity(), "Death", deathYear);
 
         eventDao.insert(childDeath);
+        eventCount++;
+
+        // add graduation for every person based off birthYear
+        addGraduation(person, birthYear);
+    }
+
+    private void addGraduation(Person person, Integer birthYear) throws DataAccessException {
+        Integer graduationYear = birthYear + 18;
+        Location graduationLocation = locations.getData()[(int)(locations.getData().length * Math.random())];
+        String graduationID = UUID.randomUUID().toString();
+        Event graduation = new Event(graduationID, person.getAssociatedUsername(), person.getPersonID(),
+                graduationLocation.getLatitude(), graduationLocation.getLongitude(), graduationLocation.getCountry(),
+                graduationLocation.getCity(), "Graduation", graduationYear);
+        eventDao.insert(graduation);
         eventCount++;
     }
 }

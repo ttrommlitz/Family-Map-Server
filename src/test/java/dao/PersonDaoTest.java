@@ -94,25 +94,23 @@ public class PersonDaoTest {
             persons[i] = person;
             personDao.insert(person);
         }
-        // Insert Event associated with different User
-        Person event = new Person(Integer.toString(3), "NotJimmy123X", "NotJimmy",
+        // Insert person associated with different User
+        Person person = new Person(Integer.toString(3), "NotJimmy123X", "NotJimmy",
                 "Neutron", "m", null, null,
                 null);
-        persons[3] = event;
-        personDao.insert(event);
+        persons[3] = person;
+        personDao.insert(person);
         assertNull(personDao.findAll("NonExistentUsername"));
         var result = personDao.findAll("Jimmy123X");
         assertFalse(Arrays.equals(result, persons));
     }
 
     @Test
-    public void clearPersonsPass() throws DataAccessException {
-        Person[] persons = new Person[3];
+    public void clearPersonPass() throws DataAccessException {
         for (int i = 0; i < 3; i++) {
             Person person = new Person(Integer.toString(i), "Jimmy123X", "Jimmy",
                     "Neutron", "m", null, null,
                     null);
-            persons[i] = person;
             personDao.insert(person);
         }
         personDao.clear("Person");
@@ -121,7 +119,19 @@ public class PersonDaoTest {
     }
 
     @Test
-    public void clearPersonByUsername() throws DataAccessException {
+    public void clearPersonPassTwo() throws DataAccessException {
+        for (int i = 0; i < 3; i++) {
+            Person person = new Person(Integer.toString(i), "Jimmy123X", "Jimmy",
+                    "Neutron", "m", null, null,
+                    null);
+            personDao.insert(person);
+        }
+        personDao.clear("Person");
+        assertDoesNotThrow(() -> personDao.clear("Person"));
+    }
+
+    @Test
+    public void clearPersonByUsernamePass() throws DataAccessException {
         personDao.insert(bestPerson);
         Person newPerson = new Person("1234567", "Jimmy123Y",
                 "Jimmy", "Neutron", "m", null, null, null);
@@ -129,5 +139,16 @@ public class PersonDaoTest {
         personDao.clearByUsername("Person", "Jimmy123X");
         assertNull(personDao.find("123456"));
         assertNotNull(personDao.find("1234567"));
+    }
+
+    @Test
+    public void clearPersonByUsernamePassTwo() throws DataAccessException {
+        personDao.insert(bestPerson);
+        Person newPerson = new Person("1234567", "Jimmy123Y",
+                "Jimmy", "Neutron", "m", null, null, null);
+        personDao.insert(newPerson);
+        personDao.clearByUsername("Person", "Jimmy123X");
+        assertDoesNotThrow(() -> personDao.clearByUsername("Person", "Jimmy123X"));
+        assertNotNull(personDao.find(("1234567")));
     }
 }

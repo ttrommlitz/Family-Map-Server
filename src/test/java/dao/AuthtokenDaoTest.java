@@ -67,16 +67,31 @@ public class AuthtokenDaoTest {
         authtokenDao.insert(bestAuthtoken);
         authtokenDao.clear("Authtoken");
         assertNull(authtokenDao.find("thisisatoken"));
-        authtokenDao.clear("Authtoken");
     }
 
     @Test
-    public void clearAuthtokenByUsername() throws DataAccessException {
+    public void clearAuthtokenPassTwo() throws DataAccessException {
+        authtokenDao.insert(bestAuthtoken);
+        authtokenDao.clear("Authtoken");
+        assertDoesNotThrow(() -> authtokenDao.clear("Authtoken"));
+    }
+
+    @Test
+    public void clearAuthtokenByUsernamePass() throws DataAccessException {
         authtokenDao.insert(bestAuthtoken);
         Authtoken newToken = new Authtoken("thisisanewtoken", "generalZod2");
         authtokenDao.insert(newToken);
         authtokenDao.clearByUsername("Authtoken", "generalZod");
         assertNull(authtokenDao.find("thisisatoken"));
         assertNotNull(authtokenDao.find("thisisanewtoken"));
+    }
+
+    @Test
+    public void clearAuthtokenByUsernamePassTwo() throws DataAccessException {
+        authtokenDao.insert(bestAuthtoken);
+        Authtoken newToken = new Authtoken("thisisanewtoken", "generalZod2");
+        authtokenDao.insert(newToken);
+        authtokenDao.clearByUsername("Authtoken", "generalZod");
+        assertDoesNotThrow(() -> authtokenDao.clearByUsername("Authtoken", "generalZod"));
     }
 }

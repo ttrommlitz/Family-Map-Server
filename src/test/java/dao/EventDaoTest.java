@@ -21,11 +21,8 @@ public class EventDaoTest {
                 35.9f, 140.1f, "Japan", "Ushiku",
                 "Biking_Around", 2016);
 
-        // Here, we'll open the connection in preparation for the test case to use it
         Connection conn = db.getConnection();
-        //Then we pass that connection to the EventDAO, so it can access the database.
         eventDao = new EventDao(conn);
-        //Let's clear the database as well so any lingering data doesn't affect our tests
         eventDao.clear("Event");
     }
 
@@ -100,21 +97,30 @@ public class EventDaoTest {
 
     @Test
     public void clearEventPass() throws DataAccessException {
-        Event[] events = new Event[3];
         for (int i = 0; i < 3; i++) {
             Event event = new Event(Integer.toString(i), "Gale", "Gale123A",
                     35.9f, 140.1f, "Japan", "Ushiku",
                     "Biking_Around", 2016);
-            events[i] = event;
             eventDao.insert(event);
         }
         eventDao.clear("Event");
         assertNull(eventDao.findAll("Gale"));
-        eventDao.clear("Event");
     }
 
     @Test
-    public void clearEventByUsername() throws DataAccessException {
+    public void clearEventPassTwo() throws DataAccessException {
+        for (int i = 0; i < 3; i++) {
+            Event event = new Event(Integer.toString(i), "Gale", "Gale123A",
+                    35.9f, 140.1f, "Japan", "Ushiku",
+                    "Biking_Around", 2016);
+            eventDao.insert(event);
+        }
+        eventDao.clear("Event");
+        assertDoesNotThrow(() -> eventDao.clear("Event"));
+    }
+
+    @Test
+    public void clearEventByUsernamePass() throws DataAccessException {
         Event event1 = new Event(Integer.toString(1), "Gale", "Gale123A",
                 35.9f, 140.1f, "Japan", "Ushiku",
                 "Biking_Around", 2016);
@@ -125,6 +131,21 @@ public class EventDaoTest {
         eventDao.insert(event2);
         eventDao.clearByUsername("Event", "Gale");
         assertNull(eventDao.find("1"));
+        assertNotNull(eventDao.find("2"));
+    }
+
+    @Test
+    public void clearEventByUsernamePassTwo() throws DataAccessException {
+        Event event1 = new Event(Integer.toString(1), "Gale", "Gale123A",
+                35.9f, 140.1f, "Japan", "Ushiku",
+                "Biking_Around", 2016);
+        Event event2 = new Event(Integer.toString(2), "NotGale", "Gale123A",
+                35.9f, 140.1f, "Japan", "Ushiku",
+                "Biking_Around", 2016);
+        eventDao.insert(event1);
+        eventDao.insert(event2);
+        eventDao.clearByUsername("Event", "Gale");
+        assertDoesNotThrow(() -> eventDao.clearByUsername("Event", "Gale"));
         assertNotNull(eventDao.find("2"));
     }
 }

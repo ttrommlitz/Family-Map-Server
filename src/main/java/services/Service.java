@@ -22,14 +22,6 @@ public abstract class Service {
         }
     }
 
-    public void closeConnection(boolean commit) {
-        db.closeConnection(commit);
-    }
-
-    public Connection getConnection() {
-        return conn;
-    }
-
     protected void handleException(DataAccessException e, Result result) {
         e.printStackTrace();
         result.setMessage("Error: " + e.getMessage());

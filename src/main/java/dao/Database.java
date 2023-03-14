@@ -50,14 +50,6 @@ public class Database {
         }
     }
 
-    // When we are done manipulating the database it is important to close the connection. This will
-    // end the transaction and allow us to either commit our changes to the database (if true is passed in)
-    // or rollback any changes that were made before we encountered a potential error (if false is passed in).
-
-    // IMPORTANT: IF YOU FAIL TO CLOSE A CONNECTION AND TRY TO REOPEN THE DATABASE THIS WILL CAUSE THE
-    // DATABASE TO LOCK. YOUR CODE MUST ALWAYS CLOSE THE DATABASE NO MATTER WHAT ERRORS
-    // OR PROBLEMS ARE ENCOUNTERED
-
     /**
      * Close the connection to database
      * @param commit
@@ -76,7 +68,6 @@ public class Database {
             conn = null;
             System.out.println("Connection closed!");
         } catch (SQLException e) {
-            // If you get here there are probably issues with your code and/or a connection is being left open
             e.printStackTrace();
         }
     }

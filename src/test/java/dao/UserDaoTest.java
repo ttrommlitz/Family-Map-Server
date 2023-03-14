@@ -49,26 +49,6 @@ public class UserDaoTest {
 
     }
 
-//    @Test
-//    public void updateUserPass() throws DataAccessException {
-//        userDao.insert(bestUser);
-//        User newUser = bestUser;
-//        newUser.setFirstName("A New First Name");
-//        userDao.updateUser(newUser);
-//        User result = userDao.find(newUser.getUsername());
-//        assertEquals(newUser, result);
-//    }
-//
-//    @Test
-//    public void updateUserFail() throws DataAccessException {
-//        User nullUser = new User();
-//        assertThrows(DataAccessException.class, () -> userDao.insert(nullUser));
-//        userDao.insert(bestUser);
-//        User badUser = bestUser;
-//        badUser.setUsername("nonExistentUsername");
-//        assertThrows(DataAccessException.class, () -> userDao.updateUser(badUser));
-//    }
-
     @Test
     public void findUserPass() throws DataAccessException {
         userDao.insert(bestUser);
@@ -85,14 +65,20 @@ public class UserDaoTest {
 
     @Test
     public void clearUserPass() throws DataAccessException {
-            userDao.insert(bestUser);
+        userDao.insert(bestUser);
         userDao.clear("User");
         assertNull(userDao.find("IronMan456"));
-        userDao.clear("User");
     }
 
     @Test
-    public void clearUserByUsername() throws DataAccessException {
+    public void clearUserPassTwo() throws DataAccessException {
+        userDao.insert(bestUser);
+        userDao.clear("User");
+        assertDoesNotThrow(() -> userDao.clear("User"));
+    }
+
+    @Test
+    public void clearUserByUsernamePass() throws DataAccessException {
         userDao.insert(bestUser);
         User newUser = new User("IronMan123", "thorSucks", "ironMan@gmail.com",
                 "Tony", "Stark", "m", "thisIsMyPersonID");
@@ -100,5 +86,15 @@ public class UserDaoTest {
         userDao.clearByUsername("User", "IronMan456");
         assertNull(userDao.find("IronMan456"));
         assertNotNull(userDao.find("IronMan123"));
+    }
+
+    @Test
+    public void clearUserByUsernamePassTwo() throws DataAccessException {
+        userDao.insert(bestUser);
+        User newUser = new User("IronMan123", "thorSucks", "ironMan@gmail.com",
+                "Tony", "Stark", "m", "thisIsMyPersonID");
+        userDao.insert(newUser);
+        userDao.clearByUsername("User", "IronMan456");
+        assertDoesNotThrow(() -> userDao.clearByUsername("User", "IronMan456"));
     }
 }

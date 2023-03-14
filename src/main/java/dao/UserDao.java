@@ -20,20 +20,6 @@ public class UserDao extends Dao <User> {
         super(conn);
     }
 
-//    /** Update a User in database **/
-//    public void updateUser(User user) throws DataAccessException {
-//        String sql = "UPDATE User SET username = ?, password = ?, email = ?, firstName = ?, " +
-//                "lastName = ?, gender = ?, personID = ? WHERE username = ?";
-//        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-//            prepareSQL(user, stmt);
-//            stmt.setString(8, user.getUsername());
-//            stmt.executeUpdate();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            throw new DataAccessException("Error encountered while updating a User in the database");
-//        }
-//    }
-
     /**
      * Insert a User into database
      * @param user
